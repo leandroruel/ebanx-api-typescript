@@ -10,22 +10,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
 model Account {
-  id      Int      @id @default(autoincrement())
-  name    String?
-  balance Balance?
-}
-
-model Balance {
-  id        Int      @id @default(autoincrement())
-  amount    Int
-  account   Account? @relation(fields: [accountId], references: [id])
-  accountId Int      @unique
-}
-
-model Event {
-  id          Int     @id @default(autoincrement())
-  type        String?
-  destination Int?
-  amount      Int?
+  id      Int @id @default(autoincrement())
+  balance Int @default(0)
 }
