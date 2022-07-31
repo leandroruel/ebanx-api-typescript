@@ -6,6 +6,26 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
+}
+
+model Account {
+  id      Int      @id @default(autoincrement())
+  name    String?
+  balance Balance?
+}
+
+model Balance {
+  id        Int      @id @default(autoincrement())
+  amount    Int
+  account   Account? @relation(fields: [accountId], references: [id])
+  accountId Int      @unique
+}
+
+model Event {
+  id          Int     @id @default(autoincrement())
+  type        String?
+  destination Int?
+  amount      Int?
 }
