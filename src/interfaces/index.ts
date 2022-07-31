@@ -1,7 +1,7 @@
 /**
  * Enum de tipos de evento que ocorrem na conta
  */
-enum EventType {
+export enum EventType {
   TRANSFER = 'TRANSFER',
   WITHDRAW = 'WITHDRAW',
   DEPOSIT = 'DEPOSIT'
