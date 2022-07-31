@@ -1,28 +1,42 @@
-import { Request } from 'express';
+import { HttpStatus, Injectable } from '@nestjs/common'
+import { PrismaService } from '@src/prisma/prisma.service'
+import { Balance, Prisma } from '@prisma/client'
+import { Response } from 'express'
 
+@Injectable()
 export class BalanceService {
-  constructor() {}
+  constructor(private prismaService: PrismaService) {}
 
-  async addBalance(request: Request) {
-    return {
-      balance: 2
-    };
+  /**
+   * Adiciona saldo à uma conta co determinado id
+   * @param data
+   * @returns
+   */
+  async create(data: Prisma.BalanceCreateInput): Promise<Balance> {
+    return this.prismaService.balance.create({ data })
   }
 
-  async getBalance(id: string) {
-    return {
-      balance: 200
-    };
-  }
+  /**
+   * Retorna o saldo de uma conta com determinado id
+   * @param {number} id o id da conta
+   * @returns
+   */
+  async getBalance(id: number, response: Response): Promise<Response<number>> {
+    try {
+      const {
+        balance: { amount }
+      } = await this.prismaService.account.findFirst({
+        where: { id: Number(id) },
+        include: {
+          balance: {
+            select: { amount: true }
+          }
+        }
+      })
 
-  async getAll() {
-    return [
-      {
-        balance: 200
-      },
-      {
-        balance: 300
-      }
-    ];
+      return response.status(HttpStatus.OK).json(amount)
+    } catch (error) {
+      return response.status(HttpStatus.NOT_FOUND).json(0)
+    }
   }
 }
