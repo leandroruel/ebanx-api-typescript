@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common'
+import { HttpStatus, Injectable } from '@nestjs/common'
 import { AccountsService } from '@src/accounts/accounts.service'
+import {
+  DESTINATION_ACCOUNT_ALREADY_EXISTS,
+  EVENT_NOT_SUPPORTED
+} from '@src/constants'
 import { Event, EventType } from '@src/interfaces'
-import { response, Response } from 'express'
+import { Response } from 'express'
 
 @Injectable()
 export class EventService {
@@ -12,7 +16,7 @@ export class EventService {
       return this.createAccountWithBalance(response, data)
     }
 
-    return response.status(400).send('event not supported')
+    return response.status(400).send(EVENT_NOT_SUPPORTED)
   }
 
   /**
@@ -23,7 +27,9 @@ export class EventService {
     const accountExists = await this.accountExists(destination)
 
     if (accountExists) {
-      return response.status(400).send('account already exists')
+      return response
+        .status(HttpStatus.BAD_REQUEST)
+        .send(DESTINATION_ACCOUNT_ALREADY_EXISTS)
     }
 
     const { id, balance } = await this.accountService.create({
