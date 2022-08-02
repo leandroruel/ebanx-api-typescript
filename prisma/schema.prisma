@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Users {
   id         Int      @id @default(autoincrement())
   name       String
   email      String
@@ -18,7 +18,7 @@ model User {
   updated_at DateTime @default(now())
 }
 
-model Account {
-  id      Int @id @default(autoincrement())
+model Accounts {
+  id      Int @id
   balance Int @default(0)
 }
