@@ -13,10 +13,9 @@ export class CommonService {
    */
   async resetState(response: Response): Promise<Response<any>> {
     try {
-      await this.prismaService.balance.deleteMany({})
-      await this.prismaService.account.deleteMany({})
+      await this.prismaService.accounts.deleteMany({})
 
-      return response.status(HttpStatus.OK).json('OK')
+      return response.status(HttpStatus.OK).send('OK')
     } catch (error) {
       return response.status(HttpStatus.BAD_REQUEST).json(error)
     }
