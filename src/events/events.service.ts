@@ -12,7 +12,7 @@ export class EventService {
   constructor(private accountService: AccountsService) {}
 
   async accountEvent(response: Response, data: Event) {
-    if (data.type === EventType.DEPOSIT) {
+    if (data.type.toUpperCase() === EventType.DEPOSIT) {
       return this.createAccountWithBalance(response, data)
     }
 
@@ -38,7 +38,7 @@ export class EventService {
     })
 
     if (id) {
-      return response.status(201).send({
+      return response.status(201).json({
         destination: {
           id: id,
           balance
