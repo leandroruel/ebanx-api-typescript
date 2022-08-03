@@ -22,7 +22,7 @@ export class EventService {
     data: Event
   ): Promise<Response<EventResponse>> {
     if (data.type.toUpperCase() === EventType.DEPOSIT) {
-      return this.createAccountWithBalance(response, data)
+      return this.depositEvent(response, data)
     }
 
     return response.status(HttpStatus.BAD_REQUEST).send(EVENT_NOT_SUPPORTED)
@@ -31,7 +31,7 @@ export class EventService {
   /**
    * Create a new account with a balance
    */
-  async createAccountWithBalance(
+  async depositEvent(
     response: Response,
     data: Event
   ): Promise<Response<DepositEvent>> {
@@ -39,9 +39,21 @@ export class EventService {
     const accountExists = await this.accountExists(destination)
 
     if (accountExists) {
-      return response
-        .status(HttpStatus.BAD_REQUEST)
-        .send(DESTINATION_ACCOUNT_ALREADY_EXISTS)
+      //get the actual account before updating it
+      const account = await this.accountService.getAccount(destination)
+
+      // update the account balance
+      const { id, balance } = await this.accountService.update({
+        id: destination,
+        balance: Number(account.balance) + Number(amount)
+      })
+
+      return response.status(HttpStatus.CREATED).json({
+        destination: {
+          id,
+          balance
+        }
+      })
     }
 
     const { id, balance } = await this.accountService.create({
@@ -50,7 +62,9 @@ export class EventService {
     })
 
     if (id) {
-      return response.status(201).json({ destination: { id: id, balance } })
+      return response
+        .status(HttpStatus.CREATED)
+        .json({ destination: { id: id, balance } })
     }
   }
 

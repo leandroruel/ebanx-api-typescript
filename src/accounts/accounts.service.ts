@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { Accounts, Prisma } from '@prisma/client'
 import { MISSING_ACCOUNT_ID } from '@src/constants'
 import { PrismaService } from '@src/prisma/prisma.service'
-import { Response } from 'express'
 
 @Injectable()
 export class AccountsService {
@@ -13,6 +12,18 @@ export class AccountsService {
     return this.prismaService.accounts.create({
       data: {
         id: Number(id),
+        balance: Number(balance)
+      }
+    })
+  }
+
+  update(data: Prisma.AccountsUpdateInput): Promise<Accounts> {
+    const { balance, id } = data
+    return this.prismaService.accounts.update({
+      where: {
+        id: Number(id)
+      },
+      data: {
         balance: Number(balance)
       }
     })
