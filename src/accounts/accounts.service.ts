@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { Accounts, Prisma } from '@prisma/client'
+import { MISSING_ACCOUNT_ID } from '@src/constants'
 import { PrismaService } from '@src/prisma/prisma.service'
+import { Response } from 'express'
 
 @Injectable()
 export class AccountsService {
@@ -21,8 +23,10 @@ export class AccountsService {
    * @param {number} id the id of the account
    * @returns {Promise<Accounts>} the account object
    */
-  getAccount(id: number): Promise<Accounts> {
-    return this.prismaService.accounts.findFirst({
+  async getAccount(id: number): Promise<Accounts> {
+    if (!id) throw new HttpException(MISSING_ACCOUNT_ID, HttpStatus.BAD_REQUEST)
+
+    return await this.prismaService.accounts.findFirst({
       where: {
         id: Number(id)
       }

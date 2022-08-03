@@ -4,25 +4,37 @@ import {
   DESTINATION_ACCOUNT_ALREADY_EXISTS,
   EVENT_NOT_SUPPORTED
 } from '@src/constants'
-import { Event, EventType } from '@src/interfaces'
+import { DepositEvent, Event, EventResponse, EventType } from '@src/interfaces'
 import { Response } from 'express'
 
 @Injectable()
 export class EventService {
   constructor(private accountService: AccountsService) {}
 
-  async accountEvent(response: Response, data: Event) {
+  /**
+   *
+   * @param {Response} response the response object
+   * @param {Event} data
+   * @returns {Promise<Response<EventResponse>>}
+   */
+  async accountEvent(
+    response: Response,
+    data: Event
+  ): Promise<Response<EventResponse>> {
     if (data.type.toUpperCase() === EventType.DEPOSIT) {
       return this.createAccountWithBalance(response, data)
     }
 
-    return response.status(400).send(EVENT_NOT_SUPPORTED)
+    return response.status(HttpStatus.BAD_REQUEST).send(EVENT_NOT_SUPPORTED)
   }
 
   /**
    * Create a new account with a balance
    */
-  async createAccountWithBalance(response: Response, data: Event) {
+  async createAccountWithBalance(
+    response: Response,
+    data: Event
+  ): Promise<Response<DepositEvent>> {
     const { amount, destination } = data
     const accountExists = await this.accountExists(destination)
 
@@ -38,12 +50,7 @@ export class EventService {
     })
 
     if (id) {
-      return response.status(201).json({
-        destination: {
-          id: id,
-          balance
-        }
-      })
+      return response.status(201).json({ destination: { id: id, balance } })
     }
   }
 

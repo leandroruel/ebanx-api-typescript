@@ -40,3 +40,8 @@ export interface TransferEvent {
   origin: Accounts
   destination: Accounts
 }
+
+/**
+ * Representação de uma resposta de um evento de uma conta bancária.
+ */
+export type EventResponse = DepositEvent | WithdrawEvent | TransferEvent
