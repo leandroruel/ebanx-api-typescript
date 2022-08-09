@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
-import { Accounts, Prisma } from '@prisma/client'
+import { Accounts, Prisma, PrismaPromise } from '@prisma/client'
 import { MISSING_ACCOUNT_ID } from '@src/constants'
 import { PrismaService } from '@src/prisma/prisma.service'
 
@@ -26,6 +26,52 @@ export class AccountsService {
       data: {
         balance: Number(balance)
       }
+    })
+  }
+
+  /**
+   * Transfers funds from one account to another
+   * @param {number} originId the id of the origin account
+   * @param {number} destinationId the id of the destination account
+   * @param {number} amount the amount to transfer
+   * @returns {Promise<Accounts>} the recipient account object
+   */
+  async transfer(
+    originId: number,
+    destinationId: number,
+    amount: number
+  ): Promise<Accounts> {
+    return await this.prismaService.$transaction(async (prisma) => {
+      const sender = await prisma.accounts.update({
+        data: {
+          balance: {
+            decrement: amount
+          }
+        },
+        where: {
+          id: Number(originId)
+        }
+      })
+
+      if (sender.balance < 0) {
+        throw new HttpException(
+          `${originId} doesn't have enough to send ${amount}`,
+          HttpStatus.BAD_REQUEST
+        )
+      }
+
+      const recipient = prisma.accounts.update({
+        data: {
+          balance: {
+            increment: amount
+          }
+        },
+        where: {
+          id: Number(destinationId)
+        }
+      })
+
+      return recipient
     })
   }
 

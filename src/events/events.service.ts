@@ -1,10 +1,17 @@
-import { HttpStatus, Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { AccountsService } from '@src/accounts/accounts.service'
 import {
-  DESTINATION_ACCOUNT_ALREADY_EXISTS,
-  EVENT_NOT_SUPPORTED
+  DESTINATION_ACCOUNT_NOT_EXISTS,
+  EVENT_NOT_SUPPORTED,
+  ORIGIN_ACCOUNT_NOT_EXISTS
 } from '@src/constants'
-import { DepositEvent, Event, EventResponse, EventType } from '@src/interfaces'
+import {
+  DepositEvent,
+  Event,
+  EventResponse,
+  EventType,
+  TransferEvent
+} from '@src/interfaces'
 import { Response } from 'express'
 
 @Injectable()
@@ -23,6 +30,14 @@ export class EventService {
   ): Promise<Response<EventResponse>> {
     if (data.type.toUpperCase() === EventType.DEPOSIT) {
       return this.depositEvent(response, data)
+    }
+
+    if (data.type.toUpperCase() === EventType.TRANSFER) {
+      return this.tranferEvent(response, data)
+    }
+
+    if (data.type.toUpperCase() === EventType.WITHDRAW) {
+      // code...
     }
 
     return response.status(HttpStatus.BAD_REQUEST).send(EVENT_NOT_SUPPORTED)
@@ -66,6 +81,45 @@ export class EventService {
         .status(HttpStatus.CREATED)
         .json({ destination: { id: id, balance } })
     }
+  }
+
+  async tranferEvent(
+    response: Response,
+    data: Event
+  ): Promise<Response<TransferEvent>> {
+    const { amount, destination, origin } = data
+    const originAccountExists = await this.accountExists(origin)
+    const destinationAccountExists = await this.accountExists(destination)
+
+    if (!originAccountExists) {
+      throw new HttpException(ORIGIN_ACCOUNT_NOT_EXISTS, HttpStatus.BAD_REQUEST)
+    }
+
+    if (!destinationAccountExists) {
+      throw new HttpException(
+        DESTINATION_ACCOUNT_NOT_EXISTS,
+        HttpStatus.BAD_REQUEST
+      )
+    }
+
+    const originAccount = await this.accountService.transfer(
+      origin,
+      destination,
+      Number(amount)
+    )
+
+    const destinationAccount = await this.accountService.getAccount(origin)
+
+    return response.status(HttpStatus.CREATED).json({
+      origin: {
+        id: origin,
+        balance: originAccount.balance
+      },
+      destination: {
+        id: destination,
+        balance: destinationAccount.balance
+      }
+    })
   }
 
   /**
