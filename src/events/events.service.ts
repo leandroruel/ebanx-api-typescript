@@ -10,7 +10,8 @@ import {
   Event,
   EventResponse,
   EventType,
-  TransferEvent
+  TransferEvent,
+  WithdrawEvent
 } from '@src/interfaces'
 import { Response } from 'express'
 
@@ -37,7 +38,7 @@ export class EventService {
     }
 
     if (data.type.toUpperCase() === EventType.WITHDRAW) {
-      // code...
+      return this.withdrawEvent(response, data)
     }
 
     return response.status(HttpStatus.BAD_REQUEST).send(EVENT_NOT_SUPPORTED)
@@ -118,6 +119,26 @@ export class EventService {
       destination: {
         id: destination,
         balance: destinationAccount.balance
+      }
+    })
+  }
+
+  async withdrawEvent(response: Response, data: Event): Promise<any> {
+    const { origin, amount } = data
+    const accountExists = await this.accountExists(origin)
+
+    if (!accountExists) {
+      throw new HttpException(ORIGIN_ACCOUNT_NOT_EXISTS, HttpStatus.BAD_REQUEST)
+    }
+
+    console.log(amount)
+
+    const { id, balance } = await this.accountService.withDraw(origin, amount)
+
+    return response.status(HttpStatus.OK).json({
+      origin: {
+        id: id,
+        balance: Number(balance)
       }
     })
   }

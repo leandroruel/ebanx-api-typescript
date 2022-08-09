@@ -30,6 +30,44 @@ export class AccountsService {
   }
 
   /**
+   * Remove funds from an account
+   * @param {number} id the id of the account
+   * @param {number} amount the amount to remove
+   * @returns {Promise<Accounts>} the account object
+   */
+  async withDraw(id: number, amount: number): Promise<Accounts> {
+    return await this.prismaService.accounts.update({
+      where: {
+        id: Number(id)
+      },
+      data: {
+        balance: {
+          decrement: Number(amount)
+        }
+      }
+    })
+  }
+
+  /**
+   * Add funds to an account
+   * @param {number} id the id of the account
+   * @param {number} amount the amount to add
+   * @returns {Promise<Accounts>} the account object
+   */
+  async deposit(id: number, amount: number): Promise<Accounts> {
+    return await this.prismaService.accounts.update({
+      where: {
+        id: Number(id)
+      },
+      data: {
+        balance: {
+          increment: Number(amount)
+        }
+      }
+    })
+  }
+
+  /**
    * Transfers funds from one account to another
    * @param {number} originId the id of the origin account
    * @param {number} destinationId the id of the destination account
