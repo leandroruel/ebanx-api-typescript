@@ -123,15 +123,16 @@ export class EventService {
     })
   }
 
-  async withdrawEvent(response: Response, data: Event): Promise<any> {
+  async withdrawEvent(
+    response: Response,
+    data: Event
+  ): Promise<Response<WithdrawEvent>> {
     const { origin, amount } = data
     const accountExists = await this.accountExists(origin)
 
     if (!accountExists) {
-      throw new HttpException(ORIGIN_ACCOUNT_NOT_EXISTS, HttpStatus.BAD_REQUEST)
+      return response.status(HttpStatus.NOT_FOUND).send(String(0))
     }
-
-    console.log(amount)
 
     const { id, balance } = await this.accountService.withDraw(origin, amount)
 
