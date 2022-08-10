@@ -1,0 +1,171 @@
+{
+	"info": {
+		"_postman_id": "800a638f-a3f0-4279-8422-636ef582ba58",
+		"name": "BANK_API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2731921"
+	},
+	"item": [
+		{
+			"name": "TRANSFER EVENT",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "origin",
+							"value": "300",
+							"type": "text"
+						},
+						{
+							"key": "destination",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "amount",
+							"value": "20",
+							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "transfer",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3000/event",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CHECK BALANCE",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/balance?account_id=100",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"balance"
+					],
+					"query": [
+						{
+							"key": "account_id",
+							"value": "100"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RESET APP",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/reset",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"reset"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DEPOSIT EVENT",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "destination",
+							"value": "300",
+							"type": "text"
+						},
+						{
+							"key": "amount",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "type",
+							"value": "DEPOSIT",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3000/event",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "WITHDRAW EVENT",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "type",
+							"value": "withdraw",
+							"type": "text"
+						},
+						{
+							"key": "origin",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "amount",
+							"value": "5",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3000/event",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"event"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
